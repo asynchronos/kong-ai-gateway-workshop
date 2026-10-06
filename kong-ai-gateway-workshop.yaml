@@ -303,7 +303,7 @@ collection:
         meta:
           id: req_9bd8a12bf47d4be48c9b0b54e9424f33
           created: 1790911209402
-          modified: 1790917692697
+          modified: 1791297577677
           isPrivate: false
           description: ""
           sortKey: -1790911684165
@@ -328,6 +328,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 200', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -341,7 +348,7 @@ collection:
         meta:
           id: req_dae6398da7f648dfb6e0ea9b078c5418
           created: 1790912981256
-          modified: 1790917705702
+          modified: 1791297558161
           isPrivate: false
           description: ""
           sortKey: -1790911460547.125
@@ -366,6 +373,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 429', () => {
+                insomnia.expect(insomnia.response.code).to.eql(429);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -379,7 +393,7 @@ collection:
         meta:
           id: req_9df44928667640d69bebc554395b1d56
           created: 1790912989331
-          modified: 1790917711516
+          modified: 1791297564940
           isPrivate: false
           description: ""
           sortKey: -1790911236929.25
@@ -404,6 +418,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 429', () => {
+                insomnia.expect(insomnia.response.code).to.eql(429);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -417,7 +438,7 @@ collection:
         meta:
           id: req_183ac797020747ce9347e95109da5efb
           created: 1790912997050
-          modified: 1790917718350
+          modified: 1791297568762
           isPrivate: false
           description: ""
           sortKey: -1790910789643.5
@@ -442,6 +463,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 429', () => {
+                insomnia.expect(insomnia.response.code).to.eql(429);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -455,7 +483,7 @@ collection:
         meta:
           id: req_b4dd365b04b44cdbaacba0f2a41fc54f
           created: 1790913002942
-          modified: 1790917725200
+          modified: 1791297572512
           isPrivate: false
           description: ""
           sortKey: -1790910789593.5
@@ -480,6 +508,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 429', () => {
+                insomnia.expect(insomnia.response.code).to.eql(429);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1401,7 +1436,7 @@ collection:
     meta:
       id: fld_885cf8bdb6e04815a74c129f60bb4a2c
       created: 1791187069841
-      modified: 1791284178347
+      modified: 1791298075995
       sortKey: -1790844714857.8125
       description: |+
         # 7. Map the WeatherAPI to an MCP Server 
@@ -1665,7 +1700,7 @@ collection:
         meta:
           id: req_a31a5addcc514ea08ad6748f775cfbdb
           created: 1791181345685
-          modified: 1791293560881
+          modified: 1791297879584
           isPrivate: false
           description: |-
             ## 7.1. MCP Server Setup
@@ -1791,6 +1826,18 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |-
+            
+            const header = insomnia.response.headers.find(
+                header => header.key === 'mcp-session-id',
+                {},
+            );
+
+            const ENV_NAME = "Mcp-Session-Id";
+
+            insomnia.environment.set(ENV_NAME, header.value);
+            console.log(ENV_NAME,insomnia.environment.get(ENV_NAME))
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -1857,7 +1904,7 @@ collection:
         meta:
           id: req_78fb9abe92c9450cbaec2a923ecad4a1
           created: 1791197246568
-          modified: 1791269503312
+          modified: 1791297975849
           isPrivate: false
           description: >-
             ## 7.3 Complete the handshake with a notifications/initialized
@@ -1925,6 +1972,13 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 202', () => {
+                insomnia.expect(insomnia.response.code).to.eql(202);
+            });
+
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2176,9 +2230,132 @@ collection:
         meta:
           id: req_809b98b968d341c8ade36a39ded2433e
           created: 1791272577911
-          modified: 1791283185099
+          modified: 1791297819506
           isPrivate: false
-          description: ""
+          description: >-
+            ### 7.5. Run Workflow (1. Initial Chat Request)
+
+
+            ##### Pre-Request Script:
+
+            ```
+
+            // Helper function using non-trigger variable names
+
+            function parseMcpPayload(rawHttpText) {
+              const cleanText = (rawHttpText || '').trim();
+              if (!cleanText) {
+                throw new Error("Received empty payload from MCP Gateway.");
+              }
+
+              // Handle SSE format safely
+              if (cleanText.includes("data:")) {
+                const sseLine = cleanText
+                  .split('\n')
+                  .find(line => line.trim().startsWith('data:'));
+
+                if (!sseLine) {
+                  throw new Error("Could not extract 'data:' line from SSE stream.");
+                }
+
+                const payloadJson = sseLine.replace(/^data:\s*/, '').trim();
+                return JSON.parse(payloadJson);
+              }
+
+              return JSON.parse(cleanText);
+            }
+
+
+            // 1. Resolve and validate the gateway URL
+
+            const envBaseUrl = insomnia.environment.get('base_url') || '';
+
+            const envMcpPath = insomnia.environment.get('mcp_weather_path') ||
+            '';
+
+            const MCP_GATEWAY_URL = envBaseUrl + envMcpPath;
+
+
+            if (!MCP_GATEWAY_URL) {
+              throw new Error("Invalid URL! Check 'base_url' and 'mcp_weather_path' in your environment.");
+            }
+
+
+            insomnia.environment.set("MCP_GATEWAY_URL", MCP_GATEWAY_URL);
+
+
+            // 2. Prepare MCP payload
+
+            const mcpPayload = {
+              jsonrpc: "2.0",
+              id: 4,
+              method: "tools/list",
+              params: {}
+            };
+
+
+            // 3. Send request
+
+            const mcpHttpResponse = await new Promise((resolve, reject) => {
+              insomnia.sendRequest(
+                {
+                  url: MCP_GATEWAY_URL,
+                  method: 'POST',
+                  header: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/event-stream, application/json',
+                    'Mcp-Session-Id': insomnia.environment.get('Mcp-Session-Id') || ''
+                  },
+                  body: { mode: 'raw', raw: JSON.stringify(mcpPayload) }
+                },
+                (err, result) => (err ? reject(err) : resolve(result))
+              );
+            });
+
+
+            // 4. Extract body from sent request object
+
+            const gatewayOutput = mcpHttpResponse.body;
+
+
+            // 5. Parse SSE payload safely
+
+            const mcpData = parseMcpPayload(gatewayOutput);
+
+
+            if (!mcpData.result || !mcpData.result.tools) {
+              throw new Error("Invalid MCP response structure: missing 'result.tools'.");
+            }
+
+
+            // 6. Map MCP tools to OpenAI format
+
+            const openAiTools = mcpData.result.tools.map(tool => ({
+              type: "function",
+              function: {
+                name: tool.name,
+                description: tool.description || "",
+                parameters: tool.inputSchema
+              }
+            }));
+
+
+            // 7. Save to environment
+
+            insomnia.environment.set("mcp_tools_json",
+            JSON.stringify(openAiTools));
+
+            ```
+
+
+            ##### After-Response Script:
+
+            ```
+
+            insomnia.environment.set("prev_assistant_response",
+            insomnia.response.body);
+
+            ```
           sortKey: -1791180772166.4688
         method: POST
         body:
@@ -2202,6 +2379,117 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          preRequest: >-
+            // Helper function using non-trigger variable names
+
+            function parseMcpPayload(rawHttpText) {
+              const cleanText = (rawHttpText || '').trim();
+              if (!cleanText) {
+                throw new Error("Received empty payload from MCP Gateway.");
+              }
+
+              // Handle SSE format safely
+              if (cleanText.includes("data:")) {
+                const sseLine = cleanText
+                  .split('\n')
+                  .find(line => line.trim().startsWith('data:'));
+
+                if (!sseLine) {
+                  throw new Error("Could not extract 'data:' line from SSE stream.");
+                }
+
+                const payloadJson = sseLine.replace(/^data:\s*/, '').trim();
+                return JSON.parse(payloadJson);
+              }
+
+              return JSON.parse(cleanText);
+            }
+
+
+            // 1. Resolve and validate the gateway URL
+
+            const envBaseUrl = insomnia.environment.get('base_url') || '';
+
+            const envMcpPath = insomnia.environment.get('mcp_weather_path') ||
+            '';
+
+            const MCP_GATEWAY_URL = envBaseUrl + envMcpPath;
+
+
+            if (!MCP_GATEWAY_URL) {
+              throw new Error("Invalid URL! Check 'base_url' and 'mcp_weather_path' in your environment.");
+            }
+
+
+            insomnia.environment.set("MCP_GATEWAY_URL", MCP_GATEWAY_URL);
+
+
+            // 2. Prepare MCP payload
+
+            const mcpPayload = {
+              jsonrpc: "2.0",
+              id: 4,
+              method: "tools/list",
+              params: {}
+            };
+
+
+            // 3. Send request
+
+            const mcpHttpResponse = await new Promise((resolve, reject) => {
+              insomnia.sendRequest(
+                {
+                  url: MCP_GATEWAY_URL,
+                  method: 'POST',
+                  header: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'text/event-stream, application/json',
+                    'Mcp-Session-Id': insomnia.environment.get('Mcp-Session-Id') || ''
+                  },
+                  body: { mode: 'raw', raw: JSON.stringify(mcpPayload) }
+                },
+                (err, result) => (err ? reject(err) : resolve(result))
+              );
+            });
+
+
+            // 4. Extract body from sent request object
+
+            const gatewayOutput = mcpHttpResponse.body;
+
+
+            // 5. Parse SSE payload safely
+
+            const mcpData = parseMcpPayload(gatewayOutput);
+
+
+            if (!mcpData.result || !mcpData.result.tools) {
+              throw new Error("Invalid MCP response structure: missing 'result.tools'.");
+            }
+
+
+            // 6. Map MCP tools to OpenAI format
+
+            const openAiTools = mcpData.result.tools.map(tool => ({
+              type: "function",
+              function: {
+                name: tool.name,
+                description: tool.description || "",
+                parameters: tool.inputSchema
+              }
+            }));
+
+
+            // 7. Save to environment
+
+            insomnia.environment.set("mcp_tools_json",
+            JSON.stringify(openAiTools));
+          afterResponse: |-
+            const ENV_NAME = "prev_assistant_response";
+
+            insomnia.environment.set(ENV_NAME, insomnia.response.body);
+            console.log(ENV_NAME,insomnia.environment.get(ENV_NAME))
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2215,9 +2503,167 @@ collection:
         meta:
           id: req_ffdad9c60cfa45f7bcd4661a5228f7ba
           created: 1791278512874
-          modified: 1791289972840
+          modified: 1791297419948
           isPrivate: false
-          description: Execute MCP & Final Answer
+          description: >-
+            ### 7.6. Run Workflow (2. Execute MCP & Final Answer)
+
+
+            ##### Pre-Request Script:
+
+            ```
+
+            // Helper function to safely parse SSE or standard JSON from MCP
+            Gateway
+
+            function parseMcpPayload(rawHttpText) {
+              const cleanText = (rawHttpText || '').trim();
+              if (!cleanText) {
+                throw new Error("Received empty payload from MCP Gateway.");
+              }
+
+              // Handle SSE format safely (event: message \n data: {...})
+              if (cleanText.includes("data:")) {
+                const sseLine = cleanText
+                  .split('\n')
+                  .find(line => line.trim().startsWith('data:'));
+
+                if (!sseLine) {
+                  throw new Error("Could not extract 'data:' line from SSE stream.");
+                }
+
+                const payloadJson = sseLine.replace(/^data:\s*/, '').trim();
+                return JSON.parse(payloadJson);
+              }
+
+              return JSON.parse(cleanText);
+            }
+
+
+            // 1. Retrieve and parse previous LLM assistant response
+
+            const rawPrevResponse =
+            insomnia.environment.get("prev_assistant_response");
+
+            if (!rawPrevResponse) {
+              throw new Error("Missing 'prev_assistant_response' in environment variables.");
+            }
+
+
+            const parsedPrevResponse = JSON.parse(rawPrevResponse);
+
+            const rawAssistantChoice = parsedPrevResponse.choices[0].message;
+
+
+            // Clean assistant message to meet strict OpenAI schema
+
+            const cleanAssistantMessage = {
+              role: "assistant",
+              content: rawAssistantChoice.content || null
+            };
+
+
+            if (rawAssistantChoice.tool_calls) {
+              cleanAssistantMessage.tool_calls = rawAssistantChoice.tool_calls;
+            }
+
+
+            // 2. Execute MCP tool call if required
+
+            if (rawAssistantChoice.tool_calls &&
+            rawAssistantChoice.tool_calls.length > 0) {
+              const primaryToolCall = rawAssistantChoice.tool_calls[0];
+              const targetToolName = primaryToolCall.function.name;
+              
+              const parsedArguments = typeof primaryToolCall.function.arguments === 'string'
+                ? JSON.parse(primaryToolCall.function.arguments)
+                : primaryToolCall.function.arguments;
+
+              const mcpCallPayload = {
+                jsonrpc: "2.0",
+                id: 5,
+                method: "tools/call",
+                params: {
+                  name: targetToolName,
+                  arguments: parsedArguments
+                }
+              };
+
+              const targetGatewayUrl = insomnia.environment.get('MCP_GATEWAY_URL');
+
+              // Send request to MCP Gateway
+              const mcpHttpResponse = await new Promise((resolve, reject) => {
+                insomnia.sendRequest(
+                  {
+                    url: targetGatewayUrl,
+                    method: 'POST',
+                    header: { 
+                      'Content-Type': 'application/json',
+                      'Accept': 'text/event-stream, application/json',
+                      'Mcp-Session-Id': insomnia.environment.get('Mcp-Session-Id') || ''
+                    },
+                    body: { mode: 'raw', raw: JSON.stringify(mcpCallPayload) }
+                  },
+                  (err, result) => (err ? reject(err) : resolve(result))
+                );
+              });
+
+              // Extract raw body using bracket notation to protect against Insomnia auto-replacements
+              const gatewayOutput = mcpHttpResponse['body'];
+              const mcpData = parseMcpPayload(gatewayOutput);
+
+              // Extract text output from MCP response
+              let extractedTextOutput = "";
+              if (mcpData.result && mcpData.result.content) {
+                extractedTextOutput = mcpData.result.content
+                  .filter(item => item.type === 'text')
+                  .map(item => item.text)
+                  .join("\n");
+              } else if (mcpData.result) {
+                extractedTextOutput = JSON.stringify(mcpData.result);
+              }
+
+              // --- TRUNCATE TO SAVES TOKENS ---
+              // Limit output to ~500 characters to avoid exceeding AI Gateway TPM limits
+              if (extractedTextOutput.length > 500) {
+                extractedTextOutput = extractedTextOutput.substring(0, 500) + "\n...[truncated]";
+              }
+
+              // 3. Construct complete conversation history
+              const fullConversation = [
+                { role: "user", content: "Check the weather in Tokyo." },
+                cleanAssistantMessage,
+                {
+                  role: "tool",
+                  tool_call_id: primaryToolCall.id,
+                  name: targetToolName,
+                  content: extractedTextOutput
+                }
+              ];
+
+              insomnia.environment.set("final_messages_json", JSON.stringify(fullConversation));
+            } else {
+              // Fallback if no tool was invoked
+              const fallbackConversation = [
+                { role: "user", content: "Check the weather in Tokyo." },
+                cleanAssistantMessage
+              ];
+
+              insomnia.environment.set("final_messages_json", JSON.stringify(fallbackConversation));
+            }
+
+
+            // At the very end of Script 2:
+
+            const delay = (ms) => new Promise((resolve) => setTimeout(resolve,
+            ms));
+
+
+            // Wait 2.5 seconds for the Gateway TPM bucket to clear
+
+            await delay(2500);
+
+            ```
           sortKey: -1791179844468.8906
         method: POST
         body:
@@ -2235,6 +2681,157 @@ collection:
           key: apikey
           value: "{{ _['my-secret-key'] }}"
           addTo: header
+        scripts:
+          preRequest: >-
+            // Helper function to safely parse SSE or standard JSON from MCP
+            Gateway
+
+            function parseMcpPayload(rawHttpText) {
+              const cleanText = (rawHttpText || '').trim();
+              if (!cleanText) {
+                throw new Error("Received empty payload from MCP Gateway.");
+              }
+
+              // Handle SSE format safely (event: message \n data: {...})
+              if (cleanText.includes("data:")) {
+                const sseLine = cleanText
+                  .split('\n')
+                  .find(line => line.trim().startsWith('data:'));
+
+                if (!sseLine) {
+                  throw new Error("Could not extract 'data:' line from SSE stream.");
+                }
+
+                const payloadJson = sseLine.replace(/^data:\s*/, '').trim();
+                return JSON.parse(payloadJson);
+              }
+
+              return JSON.parse(cleanText);
+            }
+
+
+            // 1. Retrieve and parse previous LLM assistant response
+
+            const rawPrevResponse =
+            insomnia.environment.get("prev_assistant_response");
+
+            if (!rawPrevResponse) {
+              throw new Error("Missing 'prev_assistant_response' in environment variables.");
+            }
+
+
+            const parsedPrevResponse = JSON.parse(rawPrevResponse);
+
+            const rawAssistantChoice = parsedPrevResponse.choices[0].message;
+
+
+            // Clean assistant message to meet strict OpenAI schema
+
+            const cleanAssistantMessage = {
+              role: "assistant",
+              content: rawAssistantChoice.content || null
+            };
+
+
+            if (rawAssistantChoice.tool_calls) {
+              cleanAssistantMessage.tool_calls = rawAssistantChoice.tool_calls;
+            }
+
+
+            // 2. Execute MCP tool call if required
+
+            if (rawAssistantChoice.tool_calls &&
+            rawAssistantChoice.tool_calls.length > 0) {
+              const primaryToolCall = rawAssistantChoice.tool_calls[0];
+              const targetToolName = primaryToolCall.function.name;
+              
+              const parsedArguments = typeof primaryToolCall.function.arguments === 'string'
+                ? JSON.parse(primaryToolCall.function.arguments)
+                : primaryToolCall.function.arguments;
+
+              const mcpCallPayload = {
+                jsonrpc: "2.0",
+                id: 5,
+                method: "tools/call",
+                params: {
+                  name: targetToolName,
+                  arguments: parsedArguments
+                }
+              };
+
+              const targetGatewayUrl = insomnia.environment.get('MCP_GATEWAY_URL');
+
+              // Send request to MCP Gateway
+              const mcpHttpResponse = await new Promise((resolve, reject) => {
+                insomnia.sendRequest(
+                  {
+                    url: targetGatewayUrl,
+                    method: 'POST',
+                    header: { 
+                      'Content-Type': 'application/json',
+                      'Accept': 'text/event-stream, application/json',
+                      'Mcp-Session-Id': insomnia.environment.get('Mcp-Session-Id') || ''
+                    },
+                    body: { mode: 'raw', raw: JSON.stringify(mcpCallPayload) }
+                  },
+                  (err, result) => (err ? reject(err) : resolve(result))
+                );
+              });
+
+              // Extract raw body using bracket notation to protect against Insomnia auto-replacements
+              const gatewayOutput = mcpHttpResponse['body'];
+              const mcpData = parseMcpPayload(gatewayOutput);
+
+              // Extract text output from MCP response
+              let extractedTextOutput = "";
+              if (mcpData.result && mcpData.result.content) {
+                extractedTextOutput = mcpData.result.content
+                  .filter(item => item.type === 'text')
+                  .map(item => item.text)
+                  .join("\n");
+              } else if (mcpData.result) {
+                extractedTextOutput = JSON.stringify(mcpData.result);
+              }
+
+              // --- TRUNCATE TO SAVES TOKENS ---
+              // Limit output to ~500 characters to avoid exceeding AI Gateway TPM limits
+              if (extractedTextOutput.length > 500) {
+                extractedTextOutput = extractedTextOutput.substring(0, 500) + "\n...[truncated]";
+              }
+
+              // 3. Construct complete conversation history
+              const fullConversation = [
+                { role: "user", content: "Check the weather in Tokyo." },
+                cleanAssistantMessage,
+                {
+                  role: "tool",
+                  tool_call_id: primaryToolCall.id,
+                  name: targetToolName,
+                  content: extractedTextOutput
+                }
+              ];
+
+              insomnia.environment.set("final_messages_json", JSON.stringify(fullConversation));
+            } else {
+              // Fallback if no tool was invoked
+              const fallbackConversation = [
+                { role: "user", content: "Check the weather in Tokyo." },
+                cleanAssistantMessage
+              ];
+
+              insomnia.environment.set("final_messages_json", JSON.stringify(fallbackConversation));
+            }
+
+
+            // At the very end of Script 2:
+
+            const delay = (ms) => new Promise((resolve) => setTimeout(resolve,
+            ms));
+
+
+            // Wait 2.5 seconds for the Gateway TPM bucket to clear
+
+            await delay(2500);
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -2248,13 +2845,13 @@ cookieJar:
   meta:
     id: jar_362e14b51a06f4193794c5b088e1740aafa1bd6b
     created: 1791287162803
-    modified: 1791287162803
+    modified: 1791298075977
 environments:
   name: Base Environment
   meta:
     id: env_362e14b51a06f4193794c5b088e1740aafa1bd6b
     created: 1790844715173
-    modified: 1791284178331
+    modified: 1791298075990
     isPrivate: false
   subEnvironments:
     - name: local-env.template

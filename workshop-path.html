@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kong AI Gateway workshop path</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:       #f4f7f4;
+      --color-paper-2:     #e7eee9;
+      --color-ink:         #163028;
+      --color-muted:       #3f5c4e;
+      --color-soft:        #6d8578;
+      --color-rule:        rgba(22,48,40,0.12);
+      --color-accent:      #0b8f5a;
+      --color-accent-tint: rgba(11,143,90,0.10);
+      --color-link:        #0e6b48;
+      --font-sans:   'Geist', system-ui, sans-serif;
+      --font-serif:  'Instrument Serif', Georgia, serif;
+      --font-mono:   'Geist Mono', ui-monospace, Menlo, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      min-height: 100vh;
+      padding: 3rem 2rem;
+      color: var(--color-ink);
+    }
+    .container { max-width: 1120px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.75rem, 3vw + 1rem, 2.5rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+    }
+    .subtitle {
+      font-size: 1rem;
+      line-height: 1.55;
+      color: var(--color-muted);
+      max-width: 68ch;
+    }
+    .diagram-container { overflow-x: auto; }
+    .summary {
+      display: grid;
+      grid-template-columns: 1.2fr 0.95fr 0.85fr;
+      gap: 16px;
+      margin-top: 2rem;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--color-rule);
+      border-radius: 6px;
+      padding: 1.25rem;
+    }
+    .card .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.75rem;
+    }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
+    .card ul { padding-left: 1.1rem; color: var(--color-muted); font-size: 0.9rem; line-height: 1.5; }
+    .card li + li { margin-top: 0.35rem; }
+    .footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--color-rule);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--color-soft);
+    }
+    @media (max-width: 800px) {
+      .summary { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <p class="header-eyebrow">Kong AI Gateway workshop</p>
+      <h1>Set up, govern, then extend</h1>
+      <p class="subtitle">Stand up one model, <span style="font-family:var(--font-mono);font-size:0.9rem">my-model</span>, and put governance on the traffic before an agent can spend it. Each stage adds one control in Konnect. The requests underneath prove that control, and the path ends when the MCP session shuts down.</p>
+    </header>
+
+    <div class="diagram-container">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1064 296" width="1064" height="296" role="img" aria-labelledby="workshop-path-title workshop-path-desc">
+        <title id="workshop-path-title">Kong AI Gateway workshop path</title>
+        <desc id="workshop-path-desc">Eight stages on my-model. Konnect holds the policy for each stage. The test lane sends the matching requests. Stage 7 runs MCP from 7.0 through 7.7 and ends on shutdown.</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#3f5c4e"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#0b8f5a"/>
+          </marker>
+        </defs>
+        <rect width="1064" height="296" fill="#f4f7f4"/>
+        <rect x="140" y="36" width="924" height="80" fill="rgba(22,48,40,0.018)"/>
+        <line x1="140" y1="36" x2="140" y2="196" stroke="rgba(22,48,40,0.20)" stroke-width="1"/>
+        <line x1="140" y1="36" x2="1064" y2="36" stroke="rgba(22,48,40,0.12)" stroke-width="0.8"/>
+        <line x1="140" y1="116" x2="1064" y2="116" stroke="rgba(22,48,40,0.12)" stroke-width="0.8"/>
+        <line x1="140" y1="196" x2="1064" y2="196" stroke="rgba(22,48,40,0.12)" stroke-width="0.8"/>
+
+        <line x1="248" y1="156" x2="260" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="360" y1="156" x2="372" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="472" y1="156" x2="484" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="584" y1="156" x2="596" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="696" y1="156" x2="708" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="808" y1="156" x2="820" y2="156" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <line x1="920" y1="156" x2="932" y2="156" stroke="#0b8f5a" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+
+        <g font-family="'Geist Mono', monospace" font-size="8" font-weight="500" text-anchor="middle">
+          <rect x="190" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="198" y="19" fill="#163028">0</text>
+          <text x="198" y="32" fill="#3f5c4e" letter-spacing="0.08em">START</text>
+
+          <rect x="302" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="310" y="19" fill="#163028">1</text>
+          <text x="310" y="32" fill="#3f5c4e" letter-spacing="0.08em">KEY</text>
+
+          <rect x="414" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="422" y="19" fill="#163028">2</text>
+          <text x="422" y="32" fill="#3f5c4e" letter-spacing="0.08em">LIMIT</text>
+
+          <rect x="526" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="534" y="19" fill="#163028">3</text>
+          <text x="534" y="32" fill="#3f5c4e" letter-spacing="0.08em">GUARD</text>
+
+          <rect x="638" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="646" y="19" fill="#163028">4</text>
+          <text x="646" y="32" fill="#3f5c4e" letter-spacing="0.08em">CACHE</text>
+
+          <rect x="750" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="758" y="19" fill="#163028">5</text>
+          <text x="758" y="32" fill="#3f5c4e" letter-spacing="0.08em">ROUTE</text>
+
+          <rect x="862" y="8" width="16" height="16" rx="8" fill="rgba(22,48,40,0.12)"/>
+          <text x="870" y="19" fill="#163028">6</text>
+          <text x="870" y="32" fill="#3f5c4e" letter-spacing="0.08em">PROMPT</text>
+
+          <rect x="974" y="8" width="16" height="16" rx="8" fill="rgba(11,143,90,0.20)"/>
+          <text x="982" y="19" fill="#0b8f5a">7</text>
+          <text x="982" y="32" fill="#0b8f5a" letter-spacing="0.08em">MCP</text>
+        </g>
+
+        <text x="70" y="80" fill="#3f5c4e" font-family="'Geist Mono', monospace" font-size="8" letter-spacing="0.08em" text-anchor="middle">KONNECT</text>
+        <text x="70" y="160" fill="#3f5c4e" font-family="'Geist Mono', monospace" font-size="8" letter-spacing="0.08em" text-anchor="middle">TEST</text>
+
+        <g font-family="'Geist', sans-serif">
+          <rect x="148" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="148" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="156" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="167" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="198" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Model</text>
+          <text x="198" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">my-model</text>
+
+          <rect x="260" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="260" y="44" width="100" height="64" rx="6" fill="rgba(184,84,80,0.06)" stroke="rgba(184,84,80,0.35)" stroke-width="1"/>
+          <rect x="268" y="48" width="22" height="12" rx="2" fill="rgba(184,84,80,0.18)"/>
+          <text x="279" y="57" fill="#b85450" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="310" y="76" fill="#b85450" font-size="12" font-weight="600" text-anchor="middle">API key</text>
+          <text x="310" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">header apikey</text>
+
+          <rect x="372" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="372" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="380" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="391" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="422" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">200 tokens</text>
+          <text x="422" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">60s window</text>
+
+          <rect x="484" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="484" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="492" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="503" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="534" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Deny topics</text>
+          <text x="534" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">by meaning</text>
+
+          <rect x="596" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="596" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="604" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="615" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="646" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Cosine 0.3</text>
+          <text x="646" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">same Redis</text>
+
+          <rect x="708" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="708" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="716" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="727" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="758" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Two targets</text>
+          <text x="758" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">gpt-4o, mistral</text>
+
+          <rect x="820" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="820" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="828" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="839" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="870" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Decorator</text>
+          <text x="870" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">then template</text>
+
+          <rect x="932" y="44" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="932" y="44" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="940" y="48" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="951" y="57" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">CFG</text>
+          <text x="982" y="76" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">MCP server</text>
+          <text x="982" y="92" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">/weather</text>
+        </g>
+
+        <g font-family="'Geist', sans-serif">
+          <rect x="148" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="148" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="156" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="167" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="198" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Hello Kong</text>
+          <text x="198" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">0 no key</text>
+
+          <rect x="260" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="260" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="268" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="279" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="310" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Secure?</text>
+          <text x="310" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">1 expects 200</text>
+
+          <rect x="372" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="372" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="380" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="391" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="422" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Five stories</text>
+          <text x="422" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">2.1 to 2.5</text>
+
+          <rect x="484" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="484" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="492" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="503" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="534" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Allow / deny</text>
+          <text x="534" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">3.1 then 3.2</text>
+
+          <rect x="596" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="596" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="604" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="615" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="646" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Miss, then hit</text>
+          <text x="646" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">4.1 then 4.2</text>
+
+          <rect x="708" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="708" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="716" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="727" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="758" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Poem or JSON</text>
+          <text x="758" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">5.1 to 5.3</text>
+
+          <rect x="820" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="820" y="124" width="100" height="64" rx="6" fill="#ffffff" stroke="#163028" stroke-width="1"/>
+          <rect x="828" y="128" width="22" height="12" rx="2" fill="transparent" stroke="rgba(22,48,40,0.40)"/>
+          <text x="839" y="137" fill="#163028" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="870" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">Raw, template</text>
+          <text x="870" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">6.1 to 6.2</text>
+
+          <rect x="932" y="124" width="100" height="64" rx="6" fill="#f4f7f4"/>
+          <rect x="932" y="124" width="100" height="64" rx="6" fill="rgba(11,143,90,0.10)" stroke="#0b8f5a" stroke-width="1.2"/>
+          <rect x="940" y="128" width="22" height="12" rx="2" fill="rgba(11,143,90,0.18)"/>
+          <text x="951" y="137" fill="#0b8f5a" font-family="'Geist Mono', monospace" font-size="7" text-anchor="middle">REQ</text>
+          <text x="982" y="156" fill="#163028" font-size="12" font-weight="600" text-anchor="middle">7.0 to 7.7</text>
+          <text x="982" y="172" fill="#6d8578" font-family="'Geist Mono', monospace" font-size="8" text-anchor="middle">end on shutdown</text>
+        </g>
+
+        <line x1="28" y1="208" x2="1036" y2="208" stroke="rgba(22,48,40,0.12)" stroke-width="0.8"/>
+        <text x="144" y="228" fill="#3f5c4e" font-family="'Geist Mono', monospace" font-size="8" letter-spacing="0.12em">STEPS</text>
+        <text x="220" y="228" fill="#3f5c4e" font-family="'Geist', sans-serif" font-size="12">0 start through 6 prompt, then 7 MCP</text>
+        <text x="144" y="252" fill="#3f5c4e" font-family="'Geist Mono', monospace" font-size="8" letter-spacing="0.12em">CONCERN</text>
+        <rect x="220" y="242" width="16" height="12" rx="2" fill="rgba(184,84,80,0.06)" stroke="rgba(184,84,80,0.35)"/>
+        <text x="244" y="252" fill="#3f5c4e" font-family="'Geist', sans-serif" font-size="12">API key is the access control</text>
+        <text x="144" y="276" fill="#3f5c4e" font-family="'Geist Mono', monospace" font-size="8" letter-spacing="0.12em">FLOW</text>
+        <line x1="220" y1="272" x2="252" y2="272" stroke="#3f5c4e" stroke-width="1" marker-end="url(#arrow)"/>
+        <text x="260" y="276" fill="#3f5c4e" font-family="'Geist', sans-serif" font-size="12">next request</text>
+        <line x1="380" y1="272" x2="412" y2="272" stroke="#0b8f5a" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <text x="420" y="276" fill="#3f5c4e" font-family="'Geist', sans-serif" font-size="12">into the MCP sequence</text>
+      </svg>
+    </div>
+
+    <section class="summary">
+      <article class="card">
+        <p class="eyebrow">Why each control exists</p>
+        <h3>Stages 0 to 6</h3>
+        <ul>
+          <li>0 The provider and my-model are in place. Hello Kong proves the proxy can reach the model with no key.</li>
+          <li>1 Key auth comes before any other policy. Without the apikey header the call is rejected. With it, “Are you secure?” returns 200.</li>
+          <li>2 The limit counts tokens, not HTTP calls. Two hundred tokens in sixty seconds. Requests 2.1 to 2.5 retell one long story until the gateway returns 429.</li>
+          <li>3 The guard blocks meaning, not a keyword list. 3.1 asks what an API gateway is. 3.2 asks for investment advice and is denied.</li>
+          <li>4 The cache serves a near-match. 4.1 misses. 4.2 asks the same thing in other words and hits.</li>
+          <li>5 Routing picks the model for the prompt. 5.1 is a poem, 5.2 is strict JSON, 5.3 is ordinary chat.</li>
+          <li>6 The caller does not own the system prompt. 6.1 decorates it. 6.2.1 sends a raw body and is blocked. 6.2.2 uses the support-query template.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Extend the gateway</p>
+        <h3>7.0 through 7.7</h3>
+        <ul>
+          <li>A REST weather API becomes one MCP tool. The client never holds the upstream key.</li>
+          <li>7.0 calls WeatherAPI directly, with gateway auth off.</li>
+          <li>7.1 opens the session. 7.2 completes the handshake and expects 202.</li>
+          <li>7.3 lists tools. The argument is query_q. 7.4 calls the tool for Bangkok.</li>
+          <li>7.5 asks my-model for Tokyo weather and passes the tool list.</li>
+          <li>7.6 sends that tool result back for the final answer.</li>
+          <li>7.7 sends DELETE and shuts the session down.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <p class="eyebrow">Keep local</p>
+        <h3>Private environment</h3>
+        <ul>
+          <li>Fill KONNECT_TOKEN, OPENAI_API_KEY, my-secret-key, and Mcp-Session-Id only in the private environment.</li>
+          <li>7.6 stays empty until 7.5’s tool call is saved as final_messages_json.</li>
+          <li>local-env.template in git keeps those values blank.</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer class="footer">Kong AI Gateway workshop · stages 0–7 · my-model · request names from the live collection</footer>
+  </div>
+</body>
+</html>

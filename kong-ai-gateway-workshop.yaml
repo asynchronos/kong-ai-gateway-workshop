@@ -1,0 +1,2278 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: Kong AI Gateway Workshop
+meta:
+  id: wrk_51aea940ff3d4ea984aef05be72cb4d3
+  created: 1790844715169
+  modified: 1790909857940
+  description: https://kong-shubham.github.io/kong-ai-gateway-workshop/
+collection:
+  - url: "{{ _.base_url }}/v1/chat/completions"
+    name: 1. Setup Key Authentication Policy
+    meta:
+      id: req_cc89e66b3ecf41898b32d44f0b4f060e
+      created: 1790844715374
+      modified: 1790930658727
+      isPrivate: false
+      description: >-
+        # 1. Setup Key Authentication Policy
+
+
+        Before proceeding with AI Governance, secure your AI Model with API
+        Keys. In Kong AI Gateway 2.0, policies are attached directly to the AI
+        Model entity.
+
+
+        1. Navigate to your my-model AI Model in the Konnect UI.
+
+        2. Open the Access tab and click Add auth strategy.
+
+        3. give a Diplay Name say Key-Auth Leave the default settings (Header
+        name: apikey). Click add
+
+        4. Go to Consumers tab in AI gateway in the left menu, create a new
+        consumer of type API Key, Give Display Name and Consumer Id as and click
+        Next ai-developer.
+
+        5. Under the consumer's credentials tab, generate a new API Key or type
+        it in, click Create Key (e.g., my-secret-key).
+
+
+        ## Testing Script
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "Are you secure?"}],
+            "model": "my-model"
+          }'
+        ```
+      sortKey: -1790844715375
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"messages": [
+        		{
+        			"role": "user",
+        			"content": "Are you secure?"
+        		}
+        	],
+        	"model": "my-model"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    authentication:
+      type: apikey
+      key: apikey
+      value: "{{ _['my-secret-key'] }}"
+      addTo: header
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/v1/chat/completions"
+    name: 0. AI Gateway Quick Start
+    meta:
+      id: req_b0304dd0fb4f47a7add6313dccdb7a0e
+      created: 1790909895222
+      modified: 1790929879503
+      isPrivate: false
+      description: >-
+        # 0. AI Gateway Quick Start
+
+        https://kong-shubham.github.io/kong-ai-gateway-workshop/
+
+
+        ## Prerequisites & Setup
+
+
+        KONNECT_TOKEN: {{ _.KONNECT_TOKEN }}
+
+
+        apikey: your-api-key
+
+
+        ```
+
+        export KONNECT_TOKEN='{{ _.KONNECT_TOKEN }}'
+
+
+        export AI_GATEWAY_ID=your-ai-gateway-id
+
+        export KONNECT_TOKEN=$KONNECT_TOKEN
+
+        export KONNECT_CONTROL_PLANE_NAME=your-control-plane
+
+        export KONNECT_CONTROL_PLANE_URL=https://us.api.konghq.com
+
+        export KONNECT_PROXY_URL='http://localhost:8000'
+
+
+        export OPENAI_API_KEY='{{ _.OPENAI_API_KEY }}'
+
+        export OPENAI_AUTH_HEADER="Bearer $OPENAI_API_KEY"
+
+        ```
+
+
+        ## Generate & Run the data plane node with Docker
+
+
+        ```
+
+        docker run -d `
+
+        -e "KONG_ROLE=data_plane" `
+
+        -e "KONG_DATABASE=off" `
+
+        -e "KONG_VITALS=off" `
+
+        -e "KONG_CLUSTER_MTLS=pki" `
+
+        -e "KONG_CLUSTER_CONTROL_PLANE=ab8f96dcd7.us.cp.konghq.com:443" `
+
+        -e "KONG_CLUSTER_SERVER_NAME=ab8f96dcd7.us.cp.konghq.com" `
+
+        -e "KONG_CLUSTER_TELEMETRY_ENDPOINT=ab8f96dcd7.us.tp.konghq.com:443" `
+
+        -e "KONG_CLUSTER_TELEMETRY_SERVER_NAME=ab8f96dcd7.us.tp.konghq.com" `
+
+        -e "KONG_CLUSTER_CERT=[removed: certificate or private key]" `
+
+        -e "KONG_CLUSTER_CERT_KEY=[removed: certificate or private key]" `
+
+        -e "KONG_LUA_SSL_TRUSTED_CERTIFICATE=system" `
+
+        -e "KONG_KONNECT_MODE=on" `
+
+        -p 8000:8000 `
+
+        -p 8443:8443 `
+
+        kong/kong-ai-gateway:2.2.0-distroless
+
+        ```
+
+
+        ## Create Model for serving
+
+
+        1. Go to your "AI Gateway" panel in Kong.
+
+        2. Click tab "Providers" then "New Provider".
+
+        3. Create 2 Provider, OpenAI and Mistral.
+
+        4. Click tab "Models" then "New" model. Set Display name "my-model".
+
+        5. Add 3 model in "Target Models". openai:gpt-3.5-turbo, openai:gpt-4o,
+        mistral:ministral-3b-2512.
+
+
+        ## Testing Script
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [
+              {
+                "role": "user",
+                "content": "Hello Kong!"
+              }
+            ],
+            "model": "my-model"
+          }'
+        ```
+      sortKey: -1790909895222
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"messages": [
+        		{
+        			"role": "user",
+        			"content": "Hello Kong!"
+        		}
+        	],
+        	"model": "my-model"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - name: 2. AI Rate Limiting Advanced Policy
+    meta:
+      id: fld_7bc99c3b3d4844a49aa974bfa8b25e4f
+      created: 1790911672085
+      modified: 1790936029448
+      sortKey: -1790844715359.375
+      description: >-
+        # 2. AI Rate Limiting Advanced Policy
+
+
+        The AI Rate Limiting Advanced policy restricts traffic based on the
+        total number of LLM tokens processed, allowing you to control true
+        financial costs rather than just HTTP requests.
+
+
+        1. Navigate to your AI Model (my-model) and open the Policies tab.
+
+        2. Add the AI Rate Limiting Advanced policy. in Policies , add Limit
+
+        3. Set the Strategy to local (for testing purposes).
+
+        4. Under limits, specify a very low token limit for testing: [ {
+        "limit": 200, "window_size": 60 } ] keep other default settings .
+
+        5. Ensure the Tokens count strategy is explicitly set to total_okens
+        click Save and Next.
+
+        6. Click add entiry set your model name my-model done
+
+
+        Policies:
+
+        ```
+
+        [
+          {
+            "id": null,
+            "limits": [
+              {
+                "limit": 200,
+                "month_day": null,
+                "period": null,
+                "tokens_count_strategy": "total_tokens",
+                "week_start_day": null,
+                "window_size": 60
+              }
+            ],
+            "match": null,
+            "timezone": null,
+            "window_type": "sliding"
+          }
+        ]
+
+        ```
+
+
+        ## Testing Command Line:
+
+        ```
+
+        for i in {1..5}; do
+          echo "Request $i:"
+          curl -i -s -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+            -H "apikey: my-secret-key" \
+            -H "Content-Type: application/json" \
+            --json '{
+              "messages": [{"role": "user", "content": "Write a long story about API Gateways."}],
+              "model": "my-model"
+            }' | head -n 15
+          echo -e "\n----------------------------------------\n"
+        done
+
+        ```
+
+
+        ## Testing on Insomnia, Click "Run Folder" to simulate rate limite error
+    children:
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 2.1. AI Rate Limiting Advanced Policy
+        meta:
+          id: req_9bd8a12bf47d4be48c9b0b54e9424f33
+          created: 1790911209402
+          modified: 1790917692697
+          isPrivate: false
+          description: ""
+          sortKey: -1790911684165
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a long story about API Gateways."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 2.2. AI Rate Limiting Advanced Policy
+        meta:
+          id: req_dae6398da7f648dfb6e0ea9b078c5418
+          created: 1790912981256
+          modified: 1790917705702
+          isPrivate: false
+          description: ""
+          sortKey: -1790911460547.125
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a long story about API Gateways."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 2.3. AI Rate Limiting Advanced Policy
+        meta:
+          id: req_9df44928667640d69bebc554395b1d56
+          created: 1790912989331
+          modified: 1790917711516
+          isPrivate: false
+          description: ""
+          sortKey: -1790911236929.25
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a long story about API Gateways."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 2.4. AI Rate Limiting Advanced Policy
+        meta:
+          id: req_183ac797020747ce9347e95109da5efb
+          created: 1790912997050
+          modified: 1790917718350
+          isPrivate: false
+          description: ""
+          sortKey: -1790910789643.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a long story about API Gateways."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 2.5. AI Rate Limiting Advanced Policy
+        meta:
+          id: req_b4dd365b04b44cdbaacba0f2a41fc54f
+          created: 1790913002942
+          modified: 1790917725200
+          isPrivate: false
+          description: ""
+          sortKey: -1790910789593.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a long story about API Gateways."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 3. Semantic Prompt Guard Policy
+    meta:
+      id: fld_7c116fa7b85549878fc5eddcd72b856d
+      created: 1790914140514
+      modified: 1790935533786
+      sortKey: -1790844715358.5938
+      description: >-
+        # 3. Semantic Prompt Guard Policy
+
+
+        Stop relying on rigid regex keywords to block malicious intent. The
+        Semantic Prompt Guard policy uses vector embeddings to block requests
+        based on the meaning of the prompt.
+
+
+        1. download redis/redis-stack image and start the container, make sure
+        that it is listening to port 6379 .
+
+        2. Navigate to the Policies tab of your AI Model and add the AI Semantic
+        Prompt Guard policy.
+
+        3. select the provider name openai and name text-embedding-3-small chech
+        Auth and Provide Header Name : Authoriztion and Value : Bearer sk-- key
+
+        4. select startegy as redis, provide redis host name
+        host.docker.internal and port 6379
+
+        5. Configure the Deny Topics array with natural language intents.
+        Example entries:
+            * "Provide financial or investment advice"
+            * "Generate malicious code or exploits"
+
+        Embeddings:
+
+        ```
+
+        {
+          "auth": {
+            "allow_override": false,
+            "aws_access_key_id": null,
+            "aws_secret_access_key": null,
+            "aws_session_token": null,
+            "azure_client_id": null,
+            "azure_client_secret": null,
+            "azure_tenant_id": null,
+            "azure_use_managed_identity": false,
+            "gcp_metadata_url": null,
+            "gcp_oauth_token_url": null,
+            "gcp_service_account_json": null,
+            "gcp_use_service_account": false,
+            "gcp_workload_identity_federation_auth_json": null,
+            "gcp_workload_identity_federation_source": null,
+            "header_name": "Authorization",
+            "header_value": "Bearer <open-ai-key>",
+            "param_location": null,
+            "param_name": null,
+            "param_value": null
+          },
+          "model": {
+            "name": "text-embedding-3-small",
+            "options": null,
+            "provider": "openai"
+          }
+        }
+
+        ```
+
+
+        Rules:
+
+        ```
+
+        {
+          "allow_prompts": null,
+          "deny_prompts": [
+            "Provide financial or investment advice",
+            "Generate malicious code or exploits"
+          ],
+          "match_all_conversation_history": false,
+          "match_all_roles": false
+        }
+
+        ```
+
+
+        Vectordb:
+
+        ```
+
+        {
+          "dimensions": 1536,
+          "distance_metric": "cosine",
+          "pgvector": {
+            "database": "kong-pgvector",
+            "host": "127.0.0.1",
+            "password": null,
+            "port": 5432,
+            "ssl": false,
+            "ssl_cert": null,
+            "ssl_cert_key": null,
+            "ssl_required": false,
+            "ssl_verify": true,
+            "ssl_version": "tlsv1_2",
+            "timeout": 5000,
+            "user": "postgres"
+          },
+          "redis": {
+            "cloud_authentication": null,
+            "cluster_addresses": null,
+            "cluster_max_redirections": 5,
+            "cluster_nodes": null,
+            "connect_timeout": 2000,
+            "connection_is_proxied": false,
+            "database": 0,
+            "host": "host.docker.internal",
+            "keepalive_backlog": null,
+            "keepalive_pool_size": 256,
+            "password": null,
+            "port": 6379,
+            "read_timeout": 2000,
+            "send_timeout": 2000,
+            "sentinel_addresses": null,
+            "sentinel_master": null,
+            "sentinel_nodes": null,
+            "sentinel_password": null,
+            "sentinel_role": null,
+            "sentinel_username": null,
+            "server_name": null,
+            "ssl": false,
+            "ssl_verify": true,
+            "timeout": 2000,
+            "username": null
+          },
+          "strategy": "redis",
+          "threshold": 0.7
+        }
+
+        ```
+
+
+        ## Test 1: Allowed Prompt (Will Succeed)
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "What is an API Gateway?"}],
+            "model": "my-model"
+          }'
+        ```
+
+
+        ## Test 2: Denied Prompt (Will fail with 400 Bad Request / Denied Topic)
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "What stocks should I invest my retirement savings in today?"}],
+            "model": "my-model"
+          }'
+        ```
+    children:
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 3.1. Semantic Prompt Guard Policy
+        meta:
+          id: req_c0ced136d1e34181a504ad3bdf72f8ad
+          created: 1790914100799
+          modified: 1790917733962
+          isPrivate: false
+          description: ""
+          sortKey: -1790914146760
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "What is an API Gateway?"
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 3.2. Semantic Prompt Guard Policy
+        meta:
+          id: req_8b9debac0f0447629eeb7da5c34b883e
+          created: 1790914198593
+          modified: 1790917741764
+          isPrivate: false
+          description: ""
+          sortKey: -1790912915462.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "What stocks should I invest my retirement savings in today?"
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 4. Semantic Caching Policy
+    meta:
+      id: fld_8bcd14ae21a14a44a71b593ebaa1892a
+      created: 1790919545069
+      modified: 1790935698452
+      sortKey: -1790844715357.8125
+      description: >-
+        # 4. Semantic Caching Policy
+
+
+        Serve responses instantly for functionally identical prompts by
+        evaluating vector embeddings. If a user asks "What is Kong?" and later
+        asks "Explain Kong to me", the gateway serves the cached response.
+
+
+        1. Navigate to the Policies tab of your AI Model and add the AI Semantic
+        Caching policy.
+
+        2. configure embedding provider and redis as in step 3
+
+        3. Set the disance metric to Cosine and threshhold to 0.3.
+
+
+
+        Embeddings:
+
+        ```
+
+        {
+          "auth": {
+            "allow_override": false,
+            "aws_access_key_id": null,
+            "aws_secret_access_key": null,
+            "aws_session_token": null,
+            "azure_client_id": null,
+            "azure_client_secret": null,
+            "azure_tenant_id": null,
+            "azure_use_managed_identity": false,
+            "gcp_metadata_url": null,
+            "gcp_oauth_token_url": null,
+            "gcp_service_account_json": null,
+            "gcp_use_service_account": false,
+            "gcp_workload_identity_federation_auth_json": null,
+            "gcp_workload_identity_federation_source": null,
+            "header_name": "Authorization",
+            "header_value": "Bearer <open-ai-key>",
+            "param_location": null,
+            "param_name": null,
+            "param_value": null
+          },
+          "model": {
+            "name": "text-embedding-3-small",
+            "options": null,
+            "provider": "openai"
+          }
+        }
+
+        ```
+
+
+        Vectordb:
+
+        ```
+
+        {
+          "dimensions": 1024,
+          "distance_metric": "cosine",
+          "pgvector": {
+            "database": "kong-pgvector",
+            "host": "127.0.0.1",
+            "password": null,
+            "port": 5432,
+            "ssl": false,
+            "ssl_cert": null,
+            "ssl_cert_key": null,
+            "ssl_required": false,
+            "ssl_verify": true,
+            "ssl_version": "tlsv1_2",
+            "timeout": 5000,
+            "user": "postgres"
+          },
+          "redis": {
+            "cloud_authentication": null,
+            "cluster_addresses": null,
+            "cluster_max_redirections": 5,
+            "cluster_nodes": null,
+            "connect_timeout": 2000,
+            "connection_is_proxied": false,
+            "database": 0,
+            "host": "host.docker.internal",
+            "keepalive_backlog": null,
+            "keepalive_pool_size": 256,
+            "password": null,
+            "port": 6379,
+            "read_timeout": 2000,
+            "send_timeout": 2000,
+            "sentinel_addresses": null,
+            "sentinel_master": null,
+            "sentinel_nodes": null,
+            "sentinel_password": null,
+            "sentinel_role": null,
+            "sentinel_username": null,
+            "server_name": null,
+            "ssl": false,
+            "ssl_verify": true,
+            "timeout": 2000,
+            "username": null
+          },
+          "strategy": "redis",
+          "threshold": 0.3
+        }
+
+        ```
+
+
+        ## Test 1: Allowed Prompt (Will Succeed)
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "What is an API Gateway?"}],
+            "model": "my-model"
+          }'
+        ```
+
+
+        ## Test 2: Denied Prompt (Will fail with 400 Bad Request / Denied Topic)
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "What stocks should I invest my retirement savings in today?"}],
+            "model": "my-model"
+          }'
+        ```
+    children:
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 4.1. Semantic Caching Policy
+        meta:
+          id: req_240acf19466144d6984f5508f3797833
+          created: 1790923879080
+          modified: 1790924798864
+          isPrivate: false
+          description: "# Run this once (hits OpenAI)"
+          sortKey: -1790923886412
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Explain Kong API Gateway in one sentence."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 4.2. Semantic Caching Policy
+        meta:
+          id: req_090eb924b1594039a1fd745e93d4181d
+          created: 1790923964851
+          modified: 1790924804704
+          isPrivate: false
+          description: "# Run it again (reworded). Notice the instant response time!"
+          sortKey: -1790919531560
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Describe Kong API Gateway in 1 sentence."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 5. Semantic Routing Policy
+    meta:
+      id: fld_6c1b245477234975a9cc5061e1f96e7c
+      created: 1790925339226
+      modified: 1790936303366
+      sortKey: -1790844715257.8125
+      description: >-
+        # 5. Semantic Routing Policy (deprecated)
+
+
+        Intelligently route traffic between different LLMs based on the context
+        of the user's prompt to optimize for cost or performance.
+
+
+        1. Ensure you have both an OpenAI AI Provider and a Mistral AI Provider
+        configured in Konnect.
+
+        2. On an overarching AI Model acting as your router, attach the AI
+        Semantic Routing policy.
+
+        3. Configure routing rules mapping semantic intent to specific
+        underlying providers:
+            * Route "Conversational chat or creative writing" to your generic-openai provider.
+            * Route "Data extraction and strict JSON parsing" to your mistral-provider.
+
+        ## New Method: Load Balancing
+
+        1. Navigate to the "Models" tab of your gateway.
+
+        2. Go to you model name that you setup in Step 0.
+
+        3. Go to "Target models", Click "Edit" on menu "Load Balancing".
+
+        4. Choose "Semantic Routing" under "Algorithm".
+
+        5. Configure routing rules mapping semantic intent to specific
+        underlying models:
+            * Semantic description: "Conversational chat or creative writing" to your `open-ai - gpt-4o`.
+            * Semantic description: "Data extraction and strict JSON parsing" to your `mistral-ai - ministral-3b-2512`.
+            * Semantic description: "CATCHALL" to your `open-ai - gpt-3.5-turbo`.
+        6. configure embedding provider and redis as in step 3.
+
+        7. Set "Caching similarity threshold" to 0.7
+
+        8. Uncheck `Use TLS` and `Verify TLS certificate`.
+
+
+
+        ## Test 1: Creative writing routes to gpt-3.5-turbo
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "Write a short poem about clouds."}],
+            "model": "my-model"
+          }'
+        ```
+
+
+        ## Test 2: Data extraction routes to Mistral
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "Extract the names and ages from this text: Alice is 30, Bob is 25. Output strictly as JSON."}],
+            "model": "my-model"
+          }'
+        ```
+
+
+        ## Test3: Conversion with gpt-4o
+
+        ```
+
+        curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+          -H "apikey: my-secret-key" \
+          -H "Content-Type: application/json" \
+          --json '{
+            "messages": [{"role": "user", "content": "I need someone talk with me."}],
+            "model": "my-model"
+          }'
+        ```
+    children:
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 5.1. Semantic Routing Policy
+        meta:
+          id: req_33069a22ddc849b38de2975924689e17
+          created: 1790925423710
+          modified: 1790935748543
+          isPrivate: false
+          description: "# Run it again (reworded). Notice the instant response time!"
+          sortKey: -1790925429059
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Write a short poem about clouds."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 5.2. Semantic Routing Policy
+        meta:
+          id: req_f7a7cc6f23fd46048e5f666ea5c0c8ba
+          created: 1790925684194
+          modified: 1790925726621
+          isPrivate: false
+          description: "# Run it again (reworded). Notice the instant response time!"
+          sortKey: -1790924657735.5
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Extract the names and ages from this text: Alice is 30, Bob is 25. Output strictly as JSON."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 5.3. Semantic Routing Policy
+        meta:
+          id: req_eddfc92ca1c24ae2acb9b680c5ac4fe6
+          created: 1790935785354
+          modified: 1790935981291
+          isPrivate: false
+          description: "# Run it again (reworded). Notice the instant response time!"
+          sortKey: -1790924272073.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "I need someone talk with me."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 6. Prompt Decorator & Template Policies
+    meta:
+      id: fld_35e0a790e2b34e598606aab2b5213248
+      created: 1791175191615
+      modified: 1791177163872
+      sortKey: -1790844715057.8125
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 6.2.1. Prompt Decorator Policies
+        meta:
+          id: req_e0099ecadde34c718b5d59df28718621
+          created: 1790926196550
+          modified: 1791180512078
+          isPrivate: false
+          description: >-
+            # 6.2.1. Prompt Template Policies (1)
+
+
+            ## AI Prompt Template
+
+            1. Add the AI Prompt Template policy to your AI Model.
+
+            2. Create a template named support-query.
+
+            3. Template body using Mustache syntax:
+
+            ```
+
+            {
+                "messages": [
+                    {"role": "system", "content": "You are a Kong IT Support, always answer as step 1,2,3,..."},
+                    {"role": "user", "content": "Quesion: {{question}}, System-Info: {{systeminfo}}"}
+                ]
+            }
+
+            ```
+
+            4. Set Allow Untemplated Requests to false to block raw payloads.
+
+
+            ## Testing with original template payload
+
+            ```
+
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "In KONNECT AI Gateway 2.0, How do I setup routing?"
+            		}
+            	],
+            	"model": "my-model"
+            }
+
+            ```
+
+
+            You should see the output like this:
+
+            ```
+
+            {
+            	"error": {
+            		"message": "this LLM route only supports templated requests"
+            	}
+            }
+
+            ```
+          sortKey: -1791175205881
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "In KONNECT AI Gateway 2.0, How do I setup routing?"
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 6.2.2. Prompt Template Policies
+        meta:
+          id: req_70510b419a114f45a6d3ce5b08a856e1
+          created: 1791175250501
+          modified: 1791180663028
+          isPrivate: false
+          description: >-
+            # 6.2.2. Prompt Template Policies (2)
+
+
+            ## Testing with setup template payload
+
+            ```
+
+            {
+            	"question": "How do I setup routing?",
+            	"context": "I am using Kong AI Gateway 2.0.",
+            	"model": "my-model"
+            }
+
+            ```
+
+
+            You should see the output like this:
+
+            ```
+
+            {
+            	"error": {
+            		"message": "only 'llm/v1/chat' and 'llm/v1/completions' formats are supported for templating"
+            	}
+            }
+
+            ```
+          sortKey: -1791050317470
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"question": "How do I setup routing?",
+            	"context": "I am using Kong AI Gateway 2.0.",
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 6.1. Prompt Decorator
+        meta:
+          id: req_0dd1319927464894a54fbfe789ab3b6c
+          created: 1791176817017
+          modified: 1791187346494
+          isPrivate: false
+          description: >-
+            # 6.1. Prompt Decorator Policies
+
+
+            Ensure users are supplying appropriately formatted context without
+            giving them direct control over your system instructions.
+
+
+            ## AI Prompt Decorator
+
+            1. Add the AI Prompt Decorator policy to your AI model.
+
+            2. Set the role to system.
+
+            3. Add text to inject, e.g., "You will always summarize TL;DR first,
+            before long answer.. Format output in Markdown."
+
+            4. Choose prepend to array.
+
+
+            ## Testing Script
+
+
+            ```
+
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Extract the names and ages from this text: Alice is 30, Bob is 25."
+            		}
+            	],
+            	"model": "my-model"
+            }
+
+            ```
+
+
+            ## Test: Using the custom template payload
+
+            curl -X POST "$KONNECT_PROXY_URL/v1/chat/completions" \
+              -H "apikey: my-secret-key" \
+              -H "Content-Type: application/json" \
+              --json '{
+                "role": "user",
+                "content": "Extract the names and ages from this text: Alice is 30, Bob is 25.",
+                "model": "my-model"
+              }'
+          sortKey: -1791175205981
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+            	"messages": [
+            		{
+            			"role": "user",
+            			"content": "Extract the names and ages from this text: Alice is 30, Bob is 25."
+            		}
+            	],
+            	"model": "my-model"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: 7. MCP Server Setup
+    meta:
+      id: fld_885cf8bdb6e04815a74c129f60bb4a2c
+      created: 1791187069841
+      modified: 1791284178347
+      sortKey: -1790844714857.8125
+      description: |+
+        # 7. Map the WeatherAPI to an MCP Server 
+        https://developer.konghq.com/ai-gateway/get-started-with-mcp-server/
+
+        ---
+        title: Map the WeatherAPI to an MCP Server
+        description: Learn how to create an MCP Server entity in AI Gateway to expose
+          WeatherAPI operations as MCP tools
+        url: "/ai-gateway/get-started-with-mcp-server/"
+        canonical_url: "/ai-gateway/get-started-with-mcp-server/"
+        content_type: how_to
+        min_version:
+          ai-gateway: '2.0'
+        products:
+        - AI Gateway
+        tools:
+        - kongctl
+        tags:
+        - get-started
+        - ai
+        - mcp
+        canonical: true
+        works_on:
+        - konnect
+
+
+        ---
+
+        ## Map the WeatherAPI to an MCP Server
+        ## TL;DR
+
+        **How do I expose REST APIs as MCP tools in AI Gateway?**
+        AI Gateway provides first-class MCP Server entities in Kong Konnect that expose REST APIs as tools for MCP-compatible clients.
+        Create an [AI MCP Server](/ai-gateway/entities/ai-mcp-server/) entity configured as a `conversion-listener` to convert REST endpoints into MCP tools that clients can call directly, without managing API credentials.
+
+        This tutorial shows you how to set up an AI MCP Server to expose the [WeatherAPI](https://openweathermap.org/api/one-call-4?collection=one_call_api) in Kong Konnect using [kongctl](/kongctl/), and how to proxy your first MCP request.
+
+        ## Prerequisites
+
+        ### AI Gateway running
+
+        This is a Konnect tutorial and requires a Konnect personal access token.
+
+        1. Create a new personal access token by opening the [Konnect PAT page](https://cloud.konghq.com/global/account/tokens) and selecting **Generate Token**.
+
+        2. Export your token to an environment variable:
+
+           ```bash
+           export KONNECT_TOKEN='YOUR_KONNECT_PAT'
+           ```
+
+        3. Run the AI Gateway [quickstart script](https://get.konghq.com/ai) to automatically provision a control plane and data plane in Kong Konnect, and configure your environment:
+
+           
+              
+           ```bash
+           curl -Ls https://get.konghq.com/ai | bash -s -- -k $KONNECT_TOKEN 
+           ```
+           
+        This sets up a AI Gateway control plane named `ai-quickstart`, provisions a local data plane, and prints out the following environment variables export:
+
+        ```bash
+        export AI_GATEWAY_ID=your-gateway-id
+        export KONNECT_TOKEN=$KONNECT_TOKEN
+        export KONNECT_CONTROL_PLANE_NAME=ai-quickstart
+        export KONNECT_CONTROL_PLANE_URL=https://us.api.konghq.com
+        export KONNECT_PROXY_URL='http://localhost:8000'
+        ```
+
+        Copy and paste these into your terminal to configure your session.
+
+        ### kongctl &nbsp; v1.16.0+
+
+        This tutorial uses [kongctl](/kongctl/) to manage Konnect resources programmatically.
+        We recommend keeping kongctl up to date with the latest version (1.16.0).
+
+        1. Install **kongctl** from [developer.konghq.com/kongctl](/kongctl/).
+        1. Verify the installation:
+
+           ```sh
+           kongctl version
+           ```
+
+        ### WeatherAPI account
+
+        1. Go to [WeatherAPI](https://www.weatherapi.com/).
+        1. Navigate to [your dashboard](https://www.weatherapi.com/my/) and copy your API key.
+        1. Export your API key by running the following command in your terminal:
+           ```sh
+           export WEATHERAPI_API_KEY='your-weatherapi-api-key'
+           ```
+
+        ## Create an MCP Server entity
+
+        Create an [MCP Server](/ai-gateway/entities/ai-mcp-server/) entity that exposes the [WeatherAPI](https://www.weatherapi.com/) through a single MCP tool called `get-current-weather`, mapped from the WeatherAPI `/v1/current.json` endpoint. `tools[].query.key` injects your WeatherAPI credentials automatically, so clients never handle the API key:
+
+        ```yaml
+        kongctl apply -f - --auto-approve --pat "$KONNECT_TOKEN" << 'EOF'
+        ai_gateway_mcp_servers:
+          - ref: weather-mcp
+            ai_gateway: !lookup {id: !env AI_GATEWAY_ID}
+            name: weather-mcp
+            display_name: "Weather API"
+            type: conversion-listener
+            enabled: true
+            policies: []
+            access:
+              acl_attribute_type: consumer
+              acls:
+                allow: []
+              default_tool_acls:
+                deny: []
+            config:
+              url: https://api.weatherapi.com/v1/current.json
+              route:
+                paths:
+                  - /weather
+              logging:
+                payloads: false
+                audits: true
+              server:
+                timeout: 60000
+            tools:
+              - name: get-current-weather
+                description: Get current weather for a location
+                method: GET
+                path: /weather
+                query:
+                  key:
+                    - !env WEATHERAPI_API_KEY
+                parameters:
+                  - name: q
+                    in: query
+                    required: true
+                    schema:
+                      type: string
+                    description: Location query. Accepts US Zipcode, UK Postcode, Canada Postalcode, IP address, latitude/longitude, or city name.
+        EOF
+        ```
+        {: data-test-step="block" }
+
+
+        ## Validate the MCP Server
+
+        AI Gateway implements the MCP [Streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http). Before you can call a tool, you need to open a session against the MCP Server's route.
+
+        ### Open a session
+
+        Send an `initialize` request to the route configured on the MCP Server (`/weather`), capturing the `Mcp-Session-Id` response header into an environment variable:
+
+        ```bash
+        SESSION_ID=$(curl -i -X POST "$KONNECT_PROXY_URL/weather/" \
+             --no-progress-meter --fail-with-body  \
+             -H "Content-Type: application/json"\
+             -H "Accept: application/json, text/event-stream" \
+             --json '{
+               "jsonrpc": "2.0",
+               "id": 1,
+               "method": "initialize",
+               "params": {
+                 "protocolVersion": "2025-06-18",
+                 "capabilities": {},
+                 "clientInfo": {
+                   "name": "weather-mcp-test",
+                   "version": "1.0.0"
+                 }
+               }
+             }' | grep -i '^mcp-session-id:' | tr -d '\r' | cut -d' ' -f2
+        )
+        ```
+
+        Complete the handshake with a `notifications/initialized` notification, carrying the session ID:
+
+        ```bash
+        curl -i -X POST "$KONNECT_PROXY_URL/weather/" \
+             --no-progress-meter --fail-with-body  \
+             -H "Content-Type: application/json"\
+             -H "Accept: application/json, text/event-stream"\
+             -H "Mcp-Session-Id: $SESSION_ID" \
+             --json '{
+               "jsonrpc": "2.0",
+               "method": "notifications/initialized"
+             }'
+        ```
+
+        A `202 Accepted` response confirms the session is ready.
+
+        ### Call the tool
+
+        List the available tools to confirm the `get-current-weather` tool exists, and inspect its `inputSchema`. Include the `Mcp-Session-Id` header:
+
+
+        ```bash
+        curl -X POST "$KONNECT_PROXY_URL/weather/" \
+             --no-progress-meter --fail-with-body  \
+             -H "Content-Type: application/json"\
+             -H "Accept: application/json, text/event-stream"\
+             -H "Mcp-Session-Id: $SESSION_ID" \
+             --json '{
+               "jsonrpc": "2.0",
+               "id": 2,
+               "method": "tools/list"
+             }'
+        ```
+
+         For `conversion-listener` and `conversion-only` MCP Servers, the generated `inputSchema` names each converted REST parameter `{in}_{name}`, not the bare configured name. Since [you configured](#create-an-mcp-server-entity) the `q` parameter as `name: q` and `in: query`, AI Gateway exposes to MCP clients as `query_q`. Call the tool with that argument name:
+
+        ```bash
+        curl -X POST "$KONNECT_PROXY_URL/weather/" \
+             --no-progress-meter --fail-with-body  \
+             -H "Content-Type: application/json"\
+             -H "Accept: application/json, text/event-stream"\
+             -H "Mcp-Session-Id: $SESSION_ID" \
+             --json '{
+               "jsonrpc": "2.0",
+               "id": 3,
+               "method": "tools/call",
+               "params": {
+                 "name": "get-current-weather",
+                 "arguments": {
+                   "query_q": "London"
+                 }
+               }
+             }'
+        ```
+
+        The response includes the current conditions for London:
+
+        ```text
+        event: message
+        data: {"id":3,"result":{"content":[{"type":"text","text":"{\"location\":{\"name\":\"London\",\"region\":\"City of London, Greater London\",\"country\":\"United Kingdom\",...},\"current\":{...,\"condition\":{\"text\":\"Sunny\",...},\"temp_c\":27.3,\"temp_f\":81.1,...}}"}],"isError":false},"jsonrpc":"2.0"}
+        ```
+        {:.no-copy-code.wrap}
+
+        ## Cleanup
+
+        ### Clean up AI Gateway resources
+
+        To clean up all AI Gateway resources created in this guide, run:
+
+        ```bash
+        curl -Ls https://get.konghq.com/ai | bash -s -- -d
+        ```
+
+        ## Related Resources
+
+        - [AI Gateway](/ai-gateway/)
+
+        - [MCP Traffic Gateway](/ai-gateway/mcp/)
+
+        - [AI MCP Server entity](/ai-gateway/entities/ai-mcp-server/)
+
+        - [MAP API to MCP tools](/ai-gateway/map-api-to-mcp-tools/)
+
+        - [Monitor MCP traffic with OpenTelemetry](/ai-gateway/monitor-mcp-traffic-with-otel/)
+
+    children:
+      - url: "{{ _.base_url }}/weather"
+        name: 7.1. MCP Server Setup & Opening Session
+        meta:
+          id: req_a31a5addcc514ea08ad6748f775cfbdb
+          created: 1791181345685
+          modified: 1791293560881
+          isPrivate: false
+          description: |-
+            ## 7.1. MCP Server Setup
+
+            Map an API to a Model Context Protocol (MCP) Tool to proxy MCP server traffic securely through the AI Gateway.
+
+            `Note: You must first define an MCP Server entity in Kong Konnect to expose your internal APIs as secure, observable tools that LLMs and AI Agents can consume dynamically.`
+
+            1. Navigate to the MCP Servers tab in your Konnect AI Gateway dashboard.
+            2. Click New MCP Server. Give it a displau name (e.g., weather-mcp).
+            3. Select Conversion-Listener, Define the upstream URL of your MCP-compliant service. https://api.weatherapi.com/v1/current.json
+            4. Uncheck "Forward client headers.
+            5. Expand "Advanced fields" then Check "Managed session" with Redis (same as previous setup). Click "Next"
+            6. Set Route: base path "/weather". Click "Next"
+            7. Select "ACL attribute type" as "Consumer". Click "Next".
+            8. click add tool, then set:
+            	- Name: get-current-weather
+            	- Description: Get current weather for a location
+            	- Path: /weather 
+            	- Method GET
+            	- Add query parameter:  
+            			`Name=key`  
+            			`Value=weather-api-key`
+            	- Parameters:  
+            		```
+            		[
+            			{
+            				"description": "Location query. Accepts US Zipcode, UK Postcode, Canada Postalcode, IP address, latitude/longitude, or city name.",
+            				"in": "query",
+            				"name": "q",
+            				"required": true,
+            				"schema": {
+            					"type": "string"
+            				}
+            			}
+            		]
+            		```
+            9. Click "Save".
+            		
+            ### Open a session
+
+            Send an initialize request to the route configured on the MCP Server (/weather), capturing the Mcp-Session-Id response header into an environment variable
+
+            ```
+            SESSION_ID=$(curl -i -X POST "$KONNECT_PROXY_URL/weather/" \
+                 --no-progress-meter --fail-with-body  \
+                 -H "Content-Type: application/json"\
+                 -H "Accept: application/json, text/event-stream" \
+                 --json '{
+                   "jsonrpc": "2.0",
+                   "id": 1,
+                   "method": "initialize",
+                   "params": {
+                     "protocolVersion": "2025-06-18",
+                     "capabilities": {},
+                     "clientInfo": {
+                       "name": "weather-mcp-test",
+                       "version": "1.0.0"
+                     }
+                   }
+                 }' | grep -i '^mcp-session-id:' | tr -d '\r' | cut -d' ' -f2
+            )
+            ```
+
+            You should get a response like this. Note that, following the specification, the plugin has generated a “mcp-session-id” which can be accessed in the output header. The next request should include the header.
+
+            ```
+            HTTP/1.1 200 OK
+            Date: Tue, 25 Nov 2025 15:20:55 GMT
+            Content-Type: text/event-stream
+            Transfer-Encoding: chunked
+            Connection: keep-alive
+            mcp-session-id: 00000000-0000-4000-8000-000000000001
+            Cache-Control: no-store, no-transform
+            X-Kong-Response-Latency: 1
+            Server: kong/3.13.0.0-enterprise-edition
+            X-Kong-Request-Id: 00000000000000000000000000000000
+
+            event: message
+            data: {"jsonrpc":"2.0","result":{"capabilities":{"tools":{"listChanged":false}},"instructions":"This is a MCP Server which exposes API to MCP clients.","serverInfo":{"name":"Kong","version":"3.13.0.0"},"protocolVersion":"2025-06-18"},"id":1}
+            ```
+
+            ### TODO - After Send Request
+
+            1. Status must be "200 OK".
+            2. The session will open with unique "mcp-session-id", Check it exists in the Response Header.
+            3. Use the mcp-session-id to send the handshake request.
+          sortKey: -1791187080610
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"jsonrpc": "2.0",
+            	"id": 1,
+            	"method": "initialize",
+            	"params": {
+            		"protocolVersion": "2025-06-18",
+            		"capabilities": {},
+            		"clientInfo": {
+            			"name": "weather-mcp-test",
+            			"version": "1.0.0"
+            		}
+            	}
+            }
+        parameters:
+          - name: key
+            value: "{{ _.mcp_weather_path }}"
+            disabled: true
+          - name: q
+            value: bangkok
+            disabled: true
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Accept
+            value: application/json, text/event-stream
+          - name: Mcp-Session-Id
+            value: $SESSION_ID
+            disabled: true
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: https://api.weatherapi.com/v1/current.json
+        name: 7.0. WeatherAPI Testing
+        meta:
+          id: req_3ce05e247ad84e93a5d06fdbb87f3469
+          created: 1791187157586
+          modified: 1791293466991
+          isPrivate: false
+          description: >-
+            ## 7.0. Prerequisites
+
+
+            ### WeatherAPI account
+
+
+            1. Go to [WeatherAPI](https://www.weatherapi.com/).
+
+            1. Navigate to [your dashboard](https://www.weatherapi.com/my/) and
+            copy your API key.
+
+            1. Export your API key by running the following command in your
+            terminal:
+               ```sh
+               export WEATHERAPI_API_KEY='your-weatherapi-api-key'
+               ``` 
+          sortKey: -1791187080710
+        method: POST
+        body:
+          mimeType: application/json
+        parameters:
+          - name: key
+            value: "{{ _['weather-api-key'] }}"
+          - name: q
+            value: bangkok
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Mcp-Session-Id
+            value: $SESSION_ID
+            disabled: true
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          disabled: true
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/weather"
+        name: 7.2. Complete the handshake
+        meta:
+          id: req_78fb9abe92c9450cbaec2a923ecad4a1
+          created: 1791197246568
+          modified: 1791269503312
+          isPrivate: false
+          description: >-
+            ## 7.3 Complete the handshake with a notifications/initialized
+            notification, carrying the session ID.
+
+
+            1. Status must be "202 Acceptd".
+
+            2. Go to "Console" tab to check request header "Mcp-Session_id:"
+            value.
+
+
+            ```
+
+            # curl -isX POST $DATA_PLANE_URL/weather \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json, text/event-stream" \
+              -H "mcp-session-id: 00000000-0000-4000-8000-000000000001" \
+              -d '{
+              "method":"notifications/initialized",
+              "jsonrpc":"2.0"
+            }'
+
+            ```
+
+
+            And here's the response:
+
+
+            ```
+
+            HTTP/1.1 202 Accepted
+
+            Date: Tue, 25 Nov 2025 15:22:00 GMT
+
+            Transfer-Encoding: chunked
+
+            Connection: keep-alive
+
+            X-Kong-Response-Latency: 0
+
+            Server: kong/3.13.0.0-enterprise-edition
+
+            X-Kong-Request-Id: 00000000000000000000000000000001
+
+            ```
+          sortKey: -1791187080510
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"jsonrpc": "2.0",
+            	"method": "notifications/initialized"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Accept
+            value: application/json, text/event-stream
+          - name: Mcp-Session_id
+            value: "{{ _['Mcp-Session-Id'] }}"
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/weather"
+        name: 7.3. Call the tool (1)
+        meta:
+          id: req_1dbfc1753cc840c49fa5d6b2f0b0826e
+          created: 1791267135292
+          modified: 1791276873878
+          isPrivate: false
+          description: >-
+            ## 7.3 Call the tool (1)
+
+
+            List the available tools to confirm the get-current-weather tool
+            exists, and inspect its inputSchema. Include the Mcp-Session-Id
+            header:
+
+
+            ```
+
+            curl -X POST "$KONNECT_PROXY_URL/weather/" \
+                 --no-progress-meter --fail-with-body  \
+                 -H "Content-Type: application/json"\
+                 -H "Accept: application/json, text/event-stream"\
+                 -H "Mcp-Session-Id: $SESSION_ID" \
+                 --json '{
+                   "jsonrpc": "2.0",
+                   "id": 2,
+                   "method": "tools/list"
+                 }'
+            ```
+
+
+            The expected and formatted response is the following. Note that the
+            plugin names the Tool following the format “weather-route-1”. The
+            parameter is also defined with the format “query_q”.
+
+
+            ```
+
+            event: message
+
+            data: {
+              "jsonrpc":"2.0",
+              "result":{
+                "tools":[
+                  {
+                    "description":"Get current weather for a location",
+                    "name":"weather-route-1",
+                    "id":"00000000-0000-4000-8000-000000000002",
+                    "inputSchema":{
+                      "type":"object",
+                      "properties":{
+                        "query_q":{
+                          "type":"string",
+                          "description":"Location query. Accepts US Zipcode, UK Postcode, Canada Postalcode, IP address, latitude/longitude, or city name."
+                        }
+                      },
+                      "required":[
+                        "query_q"
+                      ],
+                      "additionalProperties":false
+                    }
+                  }
+                ]
+              },
+              "id":0
+            }
+
+            ```
+          sortKey: -1791184111877.75
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"jsonrpc": "2.0",
+            	"id": 2,
+            	"method": "tools/list"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Accept
+            value: application/json, text/event-stream
+          - name: Mcp-Session_id
+            value: "{{ _['Mcp-Session-Id'] }}"
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/weather"
+        name: 7.4. Call the tool (2)
+        meta:
+          id: req_88407785b4f148de9904a4120af6b61b
+          created: 1791267660330
+          modified: 1791269277611
+          isPrivate: false
+          description: |-
+            ## 7.3 Call the tool (2)
+
+            For conversion-listener and conversion-only MCP Servers, the generated inputSchema names each converted REST parameter {in}_{name}, not the bare configured name. Since you configured the q parameter as name: q and in: query, AI Gateway exposes to MCP clients as query_q. Call the tool with that argument name:
+
+            ```
+            curl -X POST "$KONNECT_PROXY_URL/weather/" \
+                 --no-progress-meter --fail-with-body  \
+                 -H "Content-Type: application/json"\
+                 -H "Accept: application/json, text/event-stream"\
+                 -H "Mcp-Session-Id: $SESSION_ID" \
+                 --json '{
+                   "jsonrpc": "2.0",
+                   "id": 3,
+                   "method": "tools/call",
+                   "params": {
+                     "name": "get-current-weather",
+                     "arguments": {
+                       "query_q": "London"
+                     }
+                   }
+                 }'
+            ```
+
+            The response should be like:
+            ```
+            event: message
+            data: {"jsonrpc":"2.0","result":{"isError":false,"content":[{"type":"text","text":"{\"location\":{\"name\":\"Milan\",\"region\":\"Lombardia\",\"country\":\"Italy\",\"lat\":45.4667,\"lon\":9.2,\"tz_id\":\"Europe/Rome\",\"localtime_epoch\":1764084568,\"localtime\":\"2025-11-25 16:29\"},\"current\":{\"last_updated_epoch\":1764083700,\"last_updated\":\"2025-11-25 16:15\",\"temp_c\":8.2,\"temp_f\":46.8,\"is_day\":1,\"condition\":{\"text\":\"Partly Cloudy\",\"icon\":\"//cdn.weatherapi.com/weather/64x64/day/116.png\",\"code\":1003},\"wind_mph\":3.1,\"wind_kph\":5.0,\"wind_degree\":247,\"wind_dir\":\"WSW\",\"pressure_mb\":999.0,\"pressure_in\":29.5,\"precip_mm\":0.0,\"precip_in\":0.0,\"humidity\":71,\"cloud\":0,\"feelslike_c\":7.7,\"feelslike_f\":45.9,\"windchill_c\":6.8,\"windchill_f\":44.2,\"heatindex_c\":7.4,\"heatindex_f\":45.3,\"dewpoint_c\":2.4,\"dewpoint_f\":36.3,\"vis_km\":10.0,\"vis_miles\":6.0,\"uv\":0.2,\"gust_mph\":4.4,\"gust_kph\":7.1}}"}]},"id":1}
+            ```
+          sortKey: -1791182627561.625
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"jsonrpc": "2.0",
+            	"id": 3,
+            	"method": "tools/call",
+            	"params": {
+            		"name": "get-current-weather",
+            		"arguments": {
+            			"query_q": "Bangkok"
+            		}
+            	}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Accept
+            value: application/json, text/event-stream
+          - name: Mcp-Session_id
+            value: "{{ _['Mcp-Session-Id'] }}"
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/weather"
+        name: 7.7. Shutdown MCP Tool
+        meta:
+          id: req_40d74626e8ac4054a20f383eb8efc6b2
+          created: 1791269005063
+          modified: 1791289964866
+          isPrivate: false
+          description: >-
+            ## 7.5. Shutdown MCP Tool
+
+
+            The last thing a client should do is to send a Shutdown message to
+            the MCP Tool to gracefully terminate the connection.
+
+
+            ```
+
+            # curl -iX DELETE $KONNECT_PROXY_URL/weather \
+              -H "Content-Type: application/json" \
+              -H "Accept: application/json, text/event-stream" \
+              -H "mcp-session-id: 00000000-0000-4000-8000-000000000001" \
+            ```
+
+
+            The response should like:
+
+
+            ```
+
+            HTTP/1.1 200 OK
+
+            Date: Tue, 25 Nov 2025 15:40:29 GMT
+
+            Transfer-Encoding: chunked
+
+            Connection: keep-alive
+
+            X-Kong-Response-Latency: 0
+
+            Server: kong/3.13.0.0-enterprise-edition
+
+            X-Kong-Request-Id: 00000000000000000000000000000002
+
+            ```
+          sortKey: -1791178916771.3125
+        method: DELETE
+        body:
+          mimeType: application/json
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Accept
+            value: application/json, text/event-stream
+          - name: Mcp-Session_id
+            value: "{{ _['Mcp-Session-Id'] }}"
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 7.5. Run Workflow (1. Initial Chat Request)
+        meta:
+          id: req_809b98b968d341c8ade36a39ded2433e
+          created: 1791272577911
+          modified: 1791283185099
+          isPrivate: false
+          description: ""
+          sortKey: -1791180772166.4688
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+              "model": "my-model",
+              "messages": [
+                {
+                  "role": "user",
+                  "content": "Check the weather in Tokyo."
+                }
+              ],
+              "tools": {{ _.mcp_tools_json }}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/v1/chat/completions"
+        name: 7.6. Run Workflow (2. Execute MCP & Final Answer)
+        meta:
+          id: req_ffdad9c60cfa45f7bcd4661a5228f7ba
+          created: 1791278512874
+          modified: 1791289972840
+          isPrivate: false
+          description: Execute MCP & Final Answer
+          sortKey: -1791179844468.8906
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "model": "my-model",
+              "messages": {% if final_messages_json %}{{ final_messages_json }}{% else %}[]{% endif %}
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+        authentication:
+          type: apikey
+          key: apikey
+          value: "{{ _['my-secret-key'] }}"
+          addTo: header
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_362e14b51a06f4193794c5b088e1740aafa1bd6b
+    created: 1791287162803
+    modified: 1791287162803
+environments:
+  name: Base Environment
+  meta:
+    id: env_362e14b51a06f4193794c5b088e1740aafa1bd6b
+    created: 1790844715173
+    modified: 1791284178331
+    isPrivate: false
+  subEnvironments:
+    - name: local-env.template
+      meta:
+        id: env_ab09453e2dd64911b992755dbe3898aa
+        created: 1791287204971
+        modified: 1791293451423
+        isPrivate: false
+        sortKey: 1791287204971
+      data:
+        base_url: http://localhost:8000
+        mcp_weather_path: /weather
+        MCP_GATEWAY_URL: http://localhost:8000/weather
+        KONNECT_TOKEN: ""
+        OPENAI_API_KEY: ""
+        my-secret-key: ""
+        weather-api-key: ""
+        Mcp-Session-Id: ""
+        mcp_tools_json: ""
+        prev_assistant_response: ""
+        final_messages_json: ""

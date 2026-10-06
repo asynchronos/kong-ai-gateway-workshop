@@ -1,0 +1,27 @@
+type: environment.insomnia.rest/5.0
+schema_version: "5.1"
+name: local-env.template
+meta:
+  id: env_c0ffee00c0ffee00c0ffee00c0ffee00
+  created: 1791284178400
+  modified: 1791284178400
+  isPrivate: false
+  description: Non-private environment template for the Kong AI Gateway Workshop. Secret values stay empty in git. Copy them into a private environment after import.
+environments:
+  name: Base Environment
+  meta:
+    id: env_c0ffee00c0ffee00c0ffee00c0ffee01
+    created: 1791284178400
+    modified: 1791284178400
+    isPrivate: false
+  data:
+    base_url: http://localhost:8000
+    mcp_weather_path: /weather
+    MCP_GATEWAY_URL: http://localhost:8000/weather
+    KONNECT_TOKEN: ""
+    OPENAI_API_KEY: ""
+    my-secret-key: ""
+    Mcp-Session-Id: ""
+    mcp_tools_json: ""
+    prev_assistant_response: ""
+    final_messages_json: ""
